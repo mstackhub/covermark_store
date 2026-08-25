@@ -1,17 +1,20 @@
 import { createClient } from '@libsql/client';
 
-const url = process.env.TURSO_DATABASE_URL;
-const authToken = process.env.TURSO_AUTH_TOKEN;
-
-let dbClient = null;
-if (url) {
-  dbClient = createClient({
-    url: url,
-    authToken: authToken
-  });
-}
-
 export default async function handler(req, res) {
+  // CORS Headers
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   // Only allow GET
   if (req.method !== 'GET') {
     res.setHeader('Allow', ['GET']);
@@ -21,10 +24,22 @@ export default async function handler(req, res) {
   // Set Cache-Control header for Edge / CDN caching (5 minutes)
   res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
 
+  const url = process.env.TURSO_DATABASE_URL;
+  const authToken = process.env.TURSO_AUTH_TOKEN;
+
+  if (!url) {
+    console.error('❌ Error on Vercel: TURSO_DATABASE_URL environment variable is missing in Vercel Project Settings.');
+    return res.status(500).json({
+      success: false,
+      message: 'Database configuration missing in Vercel environment variables. Please add TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in Vercel Project Settings.'
+    });
+  }
+
   try {
-    if (!dbClient) {
-      throw new Error('Database client not configured');
-    }
+    const client = createClient({
+      url: url.trim(),
+      authToken: authToken ? authToken.trim() : undefined
+    });
 
     const query = `
       SELECT
@@ -42,7 +57,7 @@ export default async function handler(req, res) {
       ORDER BY store ASC, branch_name ASC;
     `;
 
-    const result = await dbClient.execute(query);
+    const result = await client.execute(query);
 
     const branches = result.rows.map(row => ({
       id: String(row.id || ''),
@@ -62,7 +77,7 @@ export default async function handler(req, res) {
       data: branches
     });
   } catch (error) {
-    console.error('API Error in /api/branches:', error.message);
+    console.error('❌ API Error in /api/branches:', error.message);
     return res.status(500).json({
       success: false,
       message: 'Unable to load branches'
