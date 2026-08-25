@@ -637,12 +637,17 @@
     }
 
     .store-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      background-color: #DD9933;
+      color: #ffffff;
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.08em;
-      color: var(--color-primary);
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      line-height: 1;
+      line-height: 1.2;
+      border-radius: 4px;
     }
 
     .branch-name {
@@ -947,12 +952,17 @@
     }
 
     .popup-store {
+      display: inline-block;
+      padding: 2px 6px;
+      background-color: #DD9933;
+      color: #ffffff;
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.08em;
-      color: var(--color-primary);
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      margin-bottom: 2px;
+      line-height: 1.2;
+      border-radius: 4px;
+      margin-bottom: 5px;
     }
 
     .popup-title {
@@ -2044,10 +2054,10 @@
         const cleanPhone = (branch.phone || '').replace(/[^0-9+]/g, '');
 
         elements.mobileCardContent.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
-            <div style="font-size:11px; font-weight:700; color:var(--color-primary); letter-spacing:0.08em; text-transform:uppercase;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+            <span style="display:inline-flex; align-items:center; padding:2px 7px; background-color:#DD9933; color:#ffffff; font-size:10px; font-weight:700; border-radius:4px; letter-spacing:0.06em; text-transform:uppercase; line-height:1.2;">
               ${escapeHTML(branch.store || 'COVERMARK')}
-            </div>
+            </span>
             <button onclick="document.getElementById('mobileSelectedCard').classList.remove('has-selection')" style="background:none;border:none;color:var(--color-text-muted);cursor:pointer;font-size:14px;">
               ✕
             </button>
