@@ -210,14 +210,14 @@
       gap: 10px;
     }
 
-    .select-wrapper {
+    .custom-dropdown-wrap {
       position: relative;
     }
 
-    .custom-select {
+    .dropdown-trigger-btn {
       width: 100%;
-      height: 40px;
-      padding: 0 32px 0 12px;
+      height: 42px;
+      padding: 0 12px;
       font-family: var(--font-family);
       font-size: 13px;
       font-weight: 500;
@@ -225,31 +225,283 @@
       background-color: var(--color-surface);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
-      appearance: none;
-      -webkit-appearance: none;
-      outline: none;
       cursor: pointer;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      transition: all var(--transition-fast);
+      user-select: none;
+      outline: none;
+    }
+
+    .dropdown-trigger-btn:hover {
+      border-color: #cbd5ce;
+      background-color: #fafbfa;
+    }
+
+    /* Active / Selected Trigger Button (COVERMARK Green Background #1D4A37 + White Text) */
+    .dropdown-trigger-btn.has-value,
+    .dropdown-trigger-btn.is-open {
+      background-color: var(--color-primary) !important;
+      border-color: var(--color-primary) !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(29, 74, 55, 0.22);
+    }
+
+    .dropdown-trigger-btn.has-value .trigger-label,
+    .dropdown-trigger-btn.is-open .trigger-label {
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    .dropdown-trigger-btn.has-value .select-chevron,
+    .dropdown-trigger-btn.is-open .select-chevron {
+      color: #ffffff !important;
+    }
+
+    .dropdown-trigger-btn.is-open .select-chevron {
+      transform: rotate(180deg);
+    }
+
+    .trigger-content {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .trigger-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .trigger-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .select-chevron {
+      width: 14px;
+      height: 14px;
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+      transition: transform var(--transition-fast), color var(--transition-fast);
+    }
+
+    /* Floating Dropdown Panel */
+    .dropdown-panel {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      width: 270px;
+      max-width: 90vw;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-popup);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: dropdownFadeIn 0.15s ease-out;
+    }
+
+    .custom-dropdown-wrap:nth-child(2) .dropdown-panel {
+      right: 0;
+      left: auto;
+    }
+
+    @keyframes dropdownFadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dropdown-panel.show {
+      display: flex;
+    }
+
+    .dropdown-panel-header {
+      padding: 10px 12px;
+      background: var(--color-surface-soft);
+      border-bottom: 1px solid var(--color-border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    .panel-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-link-action {
+      background: none;
+      border: none;
+      font-family: var(--font-family);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-primary);
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 3px;
+      transition: background-color var(--transition-fast);
+    }
+
+    .btn-link-action:hover {
+      background: var(--color-primary-soft);
+    }
+
+    .panel-actions .divider {
+      color: var(--color-text-muted);
+      font-size: 11px;
+    }
+
+    .dropdown-search-wrap {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .dropdown-search-input {
+      width: 100%;
+      height: 32px;
+      padding: 0 10px;
+      font-family: var(--font-family);
+      font-size: 12px;
+      color: var(--color-text-primary);
+      background: var(--color-surface-soft);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      outline: none;
+    }
+
+    .dropdown-search-input:focus {
+      border-color: var(--color-primary);
+      background: #ffffff;
+    }
+
+    .dropdown-options-list {
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 4px 0;
+    }
+
+    .dropdown-options-list::-webkit-scrollbar {
+      width: 5px;
+    }
+    .dropdown-options-list::-webkit-scrollbar-thumb {
+      background: var(--color-border);
+      border-radius: 4px;
+    }
+
+    .dropdown-option-item {
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--color-text-primary);
+      transition: background-color var(--transition-fast);
+      user-select: none;
+    }
+
+    .dropdown-option-item:hover {
+      background: var(--color-surface-soft);
+    }
+
+    .dropdown-option-item.selected {
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .option-checkbox-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .custom-checkbox {
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid var(--color-border);
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      flex-shrink: 0;
+      transition: all var(--transition-fast);
+    }
+
+    .dropdown-option-item.selected .custom-checkbox {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+
+    .custom-checkbox svg {
+      width: 10px;
+      height: 10px;
+      stroke: #ffffff;
+      display: none;
+    }
+
+    .dropdown-option-item.selected .custom-checkbox svg {
+      display: block;
+    }
+
+    .option-label-text {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .custom-select:focus {
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px rgba(29, 74, 55, 0.10);
+    .option-count-pill {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      padding: 1px 6px;
+      background: var(--color-surface-soft);
+      border-radius: 999px;
+      margin-left: 6px;
+      flex-shrink: 0;
     }
 
-    .select-chevron {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 14px;
-      height: 14px;
+    .dropdown-option-item.selected .option-count-pill {
+      background: rgba(29, 74, 55, 0.12);
+      color: var(--color-primary);
+    }
+
+    .option-empty-msg {
+      padding: 16px 12px;
+      font-size: 12px;
       color: var(--color-text-muted);
-      pointer-events: none;
-      transition: transform var(--transition-fast);
+      text-align: center;
     }
 
     /* Mobile View Toggle Buttons */
@@ -888,27 +1140,65 @@
         <!-- Search Hint (Minimum 3 characters) -->
         <div id="searchHint" class="search-hint"></div>
 
-        <!-- Filter Dropdowns -->
+        <!-- Custom Multi-Select Filter Dropdowns -->
         <div class="filters-row">
           
-          <!-- Province Filter -->
-          <div class="select-wrapper">
-            <select id="provinceSelect" class="custom-select" aria-label="เลือกจังหวัด">
-              <option value="">จังหวัดทั้งหมด</option>
-            </select>
-            <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+          <!-- Province Multi-Select -->
+          <div class="custom-dropdown-wrap" id="provinceDropdownWrap">
+            <button type="button" class="dropdown-trigger-btn" id="provinceDropdownBtn" aria-label="เลือกจังหวัด" aria-expanded="false">
+              <div class="trigger-content">
+                <span class="trigger-label" id="provinceTriggerLabel">จังหวัดทั้งหมด</span>
+                <span class="trigger-badge" id="provinceBadge" style="display:none;">0</span>
+              </div>
+              <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="dropdown-panel" id="provinceDropdownPanel">
+              <div class="dropdown-panel-header">
+                <span class="panel-title">เลือกจังหวัด</span>
+                <div class="panel-actions">
+                  <button type="button" class="btn-link-action" id="btnSelectAllProvinces">เลือกทั้งหมด</button>
+                  <span class="divider">·</span>
+                  <button type="button" class="btn-link-action" id="btnClearProvinces">ล้าง</button>
+                </div>
+              </div>
+              <div class="dropdown-search-wrap">
+                <input type="text" class="dropdown-search-input" id="provinceSearchInput" placeholder="ค้นหาจังหวัด..." autocomplete="off">
+              </div>
+              <div class="dropdown-options-list" id="provinceOptionsList">
+                <!-- Dynamically generated province options -->
+              </div>
+            </div>
           </div>
 
-          <!-- Store / Branch Filter -->
-          <div class="select-wrapper">
-            <select id="storeSelect" class="custom-select" aria-label="เลือกสาขา">
-              <option value="">สาขาทั้งหมด</option>
-            </select>
-            <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+          <!-- Store / Branch Multi-Select -->
+          <div class="custom-dropdown-wrap" id="storeDropdownWrap">
+            <button type="button" class="dropdown-trigger-btn" id="storeDropdownBtn" aria-label="เลือกสาขา" aria-expanded="false">
+              <div class="trigger-content">
+                <span class="trigger-label" id="storeTriggerLabel">สาขาทั้งหมด</span>
+                <span class="trigger-badge" id="storeBadge" style="display:none;">0</span>
+              </div>
+              <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="dropdown-panel" id="storeDropdownPanel">
+              <div class="dropdown-panel-header">
+                <span class="panel-title">เลือกสาขา / ห้าง</span>
+                <div class="panel-actions">
+                  <button type="button" class="btn-link-action" id="btnSelectAllStores">เลือกทั้งหมด</button>
+                  <span class="divider">·</span>
+                  <button type="button" class="btn-link-action" id="btnClearStores">ล้าง</button>
+                </div>
+              </div>
+              <div class="dropdown-search-wrap">
+                <input type="text" class="dropdown-search-input" id="storeSearchInput" placeholder="ค้นหาสาขา/ห้าง..." autocomplete="off">
+              </div>
+              <div class="dropdown-options-list" id="storeOptionsList">
+                <!-- Dynamically generated store options (cascaded by province) -->
+              </div>
+            </div>
           </div>
 
         </div>
@@ -994,12 +1284,14 @@
         filteredBranches: [],
         selectedBranchId: null,
         searchQuery: '',
-        selectedProvince: '',
-        selectedStore: '',
+        selectedProvinces: new Set(),
+        selectedStores: new Set(),
         activeView: 'list',
         map: null,
         markersMap: new Map(),
-        debounceTimer: null
+        debounceTimer: null,
+        provinceSearchQuery: '',
+        storeSearchQuery: ''
       };
 
       const elements = {
@@ -1007,8 +1299,28 @@
         searchInput: document.getElementById('searchInput'),
         searchClearBtn: document.getElementById('searchClearBtn'),
         searchHint: document.getElementById('searchHint'),
-        provinceSelect: document.getElementById('provinceSelect'),
-        storeSelect: document.getElementById('storeSelect'),
+        
+        // Custom Dropdowns
+        provinceDropdownWrap: document.getElementById('provinceDropdownWrap'),
+        provinceDropdownBtn: document.getElementById('provinceDropdownBtn'),
+        provinceTriggerLabel: document.getElementById('provinceTriggerLabel'),
+        provinceBadge: document.getElementById('provinceBadge'),
+        provinceDropdownPanel: document.getElementById('provinceDropdownPanel'),
+        provinceSearchInput: document.getElementById('provinceSearchInput'),
+        provinceOptionsList: document.getElementById('provinceOptionsList'),
+        btnSelectAllProvinces: document.getElementById('btnSelectAllProvinces'),
+        btnClearProvinces: document.getElementById('btnClearProvinces'),
+
+        storeDropdownWrap: document.getElementById('storeDropdownWrap'),
+        storeDropdownBtn: document.getElementById('storeDropdownBtn'),
+        storeTriggerLabel: document.getElementById('storeTriggerLabel'),
+        storeBadge: document.getElementById('storeBadge'),
+        storeDropdownPanel: document.getElementById('storeDropdownPanel'),
+        storeSearchInput: document.getElementById('storeSearchInput'),
+        storeOptionsList: document.getElementById('storeOptionsList'),
+        btnSelectAllStores: document.getElementById('btnSelectAllStores'),
+        btnClearStores: document.getElementById('btnClearStores'),
+
         resultCounter: document.getElementById('resultCounter'),
         resetFiltersLink: document.getElementById('resetFiltersLink'),
         branchListContainer: document.getElementById('branchListContainer'),
@@ -1020,6 +1332,7 @@
 
       document.addEventListener('DOMContentLoaded', () => {
         initMap();
+        initCustomDropdowns();
         bindEvents();
         fetchBranches();
       });
@@ -1089,7 +1402,8 @@
 
         state.filteredBranches = [...state.allBranches];
 
-        populateFilters();
+        renderDropdownOptions();
+        updateTriggerButtons();
         renderBranchList();
         renderMapMarkers();
         fitMapToMarkers();
@@ -1106,38 +1420,287 @@
         `;
       }
 
-      function populateFilters() {
-        // Extract only unique, non-empty provinces that actually have active branches
-        const provinces = [...new Set(
-          state.allBranches
-            .map(b => (b.province || '').trim())
-            .filter(p => p.length > 0 && p !== '-' && p !== 'null')
-        )].sort((a, b) => a.localeCompare(b, 'th'));
-
-        // Extract only unique, non-empty stores that actually have active branches
-        const stores = [...new Set(
-          state.allBranches
-            .map(b => (b.store || '').trim())
-            .filter(s => s.length > 0 && s !== '-' && s !== 'null')
-        )].sort((a, b) => a.localeCompare(b, 'th'));
-
-        elements.provinceSelect.innerHTML = '<option value="">จังหวัดทั้งหมด</option>';
-        provinces.forEach(prov => {
-          const opt = document.createElement('option');
-          opt.value = prov;
-          opt.textContent = prov;
-          elements.provinceSelect.appendChild(opt);
+      // ==========================================================================
+      // 2. CUSTOM MULTI-SELECT DROPDOWNS & CASCADING LOGIC
+      // ==========================================================================
+      function initCustomDropdowns() {
+        // Toggle Province Dropdown Panel
+        elements.provinceDropdownBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = elements.provinceDropdownPanel.classList.contains('show');
+          closeAllDropdowns();
+          if (!isOpen) {
+            elements.provinceDropdownPanel.classList.add('show');
+            elements.provinceDropdownBtn.classList.add('is-open');
+            elements.provinceDropdownBtn.setAttribute('aria-expanded', 'true');
+            elements.provinceSearchInput.focus();
+          }
         });
 
-        elements.storeSelect.innerHTML = '<option value="">สาขาทั้งหมด</option>';
-        stores.forEach(store => {
-          const opt = document.createElement('option');
-          opt.value = store;
-          opt.textContent = store;
-          elements.storeSelect.appendChild(opt);
+        // Toggle Store Dropdown Panel
+        elements.storeDropdownBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = elements.storeDropdownPanel.classList.contains('show');
+          closeAllDropdowns();
+          if (!isOpen) {
+            elements.storeDropdownPanel.classList.add('show');
+            elements.storeDropdownBtn.classList.add('is-open');
+            elements.storeDropdownBtn.setAttribute('aria-expanded', 'true');
+            elements.storeSearchInput.focus();
+          }
+        });
+
+        // Prevent click inside panels from closing
+        elements.provinceDropdownPanel.addEventListener('click', (e) => e.stopPropagation());
+        elements.storeDropdownPanel.addEventListener('click', (e) => e.stopPropagation());
+
+        // Close when clicking outside
+        document.addEventListener('click', () => {
+          closeAllDropdowns();
+        });
+
+        // Province Search inside Panel
+        elements.provinceSearchInput.addEventListener('input', (e) => {
+          state.provinceSearchQuery = e.target.value.trim().toLowerCase();
+          renderProvinceOptionsList();
+        });
+
+        // Store Search inside Panel
+        elements.storeSearchInput.addEventListener('input', (e) => {
+          state.storeSearchQuery = e.target.value.trim().toLowerCase();
+          renderStoreOptionsList();
+        });
+
+        // Action: Select All Provinces
+        elements.btnSelectAllProvinces.addEventListener('click', () => {
+          const available = getAvailableProvincesList();
+          available.forEach(p => state.selectedProvinces.add(p.name));
+          onFilterSelectionChanged();
+        });
+
+        // Action: Clear Provinces
+        elements.btnClearProvinces.addEventListener('click', () => {
+          state.selectedProvinces.clear();
+          onFilterSelectionChanged();
+        });
+
+        // Action: Select All Stores
+        elements.btnSelectAllStores.addEventListener('click', () => {
+          const available = getAvailableStoresList();
+          available.forEach(s => state.selectedStores.add(s.name));
+          onFilterSelectionChanged();
+        });
+
+        // Action: Clear Stores
+        elements.btnClearStores.addEventListener('click', () => {
+          state.selectedStores.clear();
+          onFilterSelectionChanged();
         });
       }
 
+      function closeAllDropdowns() {
+        elements.provinceDropdownPanel.classList.remove('show');
+        elements.provinceDropdownBtn.classList.remove('is-open');
+        elements.provinceDropdownBtn.setAttribute('aria-expanded', 'false');
+
+        elements.storeDropdownPanel.classList.remove('show');
+        elements.storeDropdownBtn.classList.remove('is-open');
+        elements.storeDropdownBtn.setAttribute('aria-expanded', 'false');
+      }
+
+      /**
+       * Compute available provinces based on currently selected stores (Cascading)
+       */
+      function getAvailableProvincesList() {
+        // If stores are selected, consider branches belonging to selected stores
+        const relevantBranches = state.selectedStores.size > 0
+          ? state.allBranches.filter(b => state.selectedStores.has(b.store))
+          : state.allBranches;
+
+        const counts = {};
+        relevantBranches.forEach(b => {
+          const p = (b.province || '').trim();
+          if (p && p !== '-' && p !== 'null') {
+            counts[p] = (counts[p] || 0) + 1;
+          }
+        });
+
+        return Object.keys(counts)
+          .map(name => ({ name, count: counts[name] }))
+          .sort((a, b) => a.name.localeCompare(b.name, 'th'));
+      }
+
+      /**
+       * Compute available stores based on currently selected provinces (Cascading Relation)
+       * E.g. If Bangkok is selected, only stores existing in Bangkok are returned!
+       */
+      function getAvailableStoresList() {
+        // If provinces are selected, consider branches belonging to selected provinces
+        const relevantBranches = state.selectedProvinces.size > 0
+          ? state.allBranches.filter(b => state.selectedProvinces.has(b.province))
+          : state.allBranches;
+
+        const counts = {};
+        relevantBranches.forEach(b => {
+          const s = (b.store || '').trim();
+          if (s && s !== '-' && s !== 'null') {
+            counts[s] = (counts[s] || 0) + 1;
+          }
+        });
+
+        return Object.keys(counts)
+          .map(name => ({ name, count: counts[name] }))
+          .sort((a, b) => a.name.localeCompare(b.name, 'th'));
+      }
+
+      function renderDropdownOptions() {
+        // Clean any previously selected stores that are not in the newly available list
+        const availStores = new Set(getAvailableStoresList().map(s => s.name));
+        for (const s of state.selectedStores) {
+          if (!availStores.has(s)) {
+            state.selectedStores.delete(s);
+          }
+        }
+
+        // Clean any previously selected provinces that are not in the newly available list
+        const availProvinces = new Set(getAvailableProvincesList().map(p => p.name));
+        for (const p of state.selectedProvinces) {
+          if (!availProvinces.has(p)) {
+            state.selectedProvinces.delete(p);
+          }
+        }
+
+        renderProvinceOptionsList();
+        renderStoreOptionsList();
+      }
+
+      function renderProvinceOptionsList() {
+        const list = getAvailableProvincesList();
+        const query = state.provinceSearchQuery;
+
+        const filtered = query
+          ? list.filter(item => item.name.toLowerCase().includes(query))
+          : list;
+
+        if (filtered.length === 0) {
+          elements.provinceOptionsList.innerHTML = `<div class="option-empty-msg">ไม่พบจังหวัดที่ตรงกัน</div>`;
+          return;
+        }
+
+        elements.provinceOptionsList.innerHTML = filtered.map(item => {
+          const isSelected = state.selectedProvinces.has(item.name);
+          return `
+            <div class="dropdown-option-item ${isSelected ? 'selected' : ''}" onclick="window.toggleProvinceOption('${escapeHTML(item.name)}')">
+              <div class="option-checkbox-wrap">
+                <span class="custom-checkbox">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span class="option-label-text">${escapeHTML(item.name)}</span>
+              </div>
+              <span class="option-count-pill">${item.count}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderStoreOptionsList() {
+        const list = getAvailableStoresList();
+        const query = state.storeSearchQuery;
+
+        const filtered = query
+          ? list.filter(item => item.name.toLowerCase().includes(query))
+          : list;
+
+        if (filtered.length === 0) {
+          elements.storeOptionsList.innerHTML = `<div class="option-empty-msg">ไม่พบสาขา/ห้างในจังหวัดที่เลือก</div>`;
+          return;
+        }
+
+        elements.storeOptionsList.innerHTML = filtered.map(item => {
+          const isSelected = state.selectedStores.has(item.name);
+          return `
+            <div class="dropdown-option-item ${isSelected ? 'selected' : ''}" onclick="window.toggleStoreOption('${escapeHTML(item.name)}')">
+              <div class="option-checkbox-wrap">
+                <span class="custom-checkbox">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+                <span class="option-label-text">${escapeHTML(item.name)}</span>
+              </div>
+              <span class="option-count-pill">${item.count}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      window.toggleProvinceOption = function(provinceName) {
+        if (state.selectedProvinces.has(provinceName)) {
+          state.selectedProvinces.delete(provinceName);
+        } else {
+          state.selectedProvinces.add(provinceName);
+        }
+        onFilterSelectionChanged();
+      };
+
+      window.toggleStoreOption = function(storeName) {
+        if (state.selectedStores.has(storeName)) {
+          state.selectedStores.delete(storeName);
+        } else {
+          state.selectedStores.add(storeName);
+        }
+        onFilterSelectionChanged();
+      };
+
+      function onFilterSelectionChanged() {
+        renderDropdownOptions();
+        updateTriggerButtons();
+        applyFilters();
+      }
+
+      function updateTriggerButtons() {
+        // Province Button Update
+        const provCount = state.selectedProvinces.size;
+        if (provCount === 0) {
+          elements.provinceTriggerLabel.textContent = 'จังหวัดทั้งหมด';
+          elements.provinceBadge.style.display = 'none';
+          elements.provinceDropdownBtn.classList.remove('has-value');
+        } else if (provCount === 1) {
+          elements.provinceTriggerLabel.textContent = Array.from(state.selectedProvinces)[0];
+          elements.provinceBadge.style.display = 'none';
+          elements.provinceDropdownBtn.classList.add('has-value');
+        } else {
+          const first = Array.from(state.selectedProvinces)[0];
+          elements.provinceTriggerLabel.textContent = `${first} +${provCount - 1}`;
+          elements.provinceBadge.textContent = provCount;
+          elements.provinceBadge.style.display = 'inline-flex';
+          elements.provinceDropdownBtn.classList.add('has-value');
+        }
+
+        // Store Button Update
+        const storeCount = state.selectedStores.size;
+        if (storeCount === 0) {
+          elements.storeTriggerLabel.textContent = 'สาขาทั้งหมด';
+          elements.storeBadge.style.display = 'none';
+          elements.storeDropdownBtn.classList.remove('has-value');
+        } else if (storeCount === 1) {
+          elements.storeTriggerLabel.textContent = Array.from(state.selectedStores)[0];
+          elements.storeBadge.style.display = 'none';
+          elements.storeDropdownBtn.classList.add('has-value');
+        } else {
+          const first = Array.from(state.selectedStores)[0];
+          elements.storeTriggerLabel.textContent = `${first} +${storeCount - 1}`;
+          elements.storeBadge.textContent = storeCount;
+          elements.storeBadge.style.display = 'inline-flex';
+          elements.storeDropdownBtn.classList.add('has-value');
+        }
+      }
+
+      // ==========================================================================
+      // 3. SEARCH & EVENTS
+      // ==========================================================================
       function bindEvents() {
         elements.searchInput.addEventListener('input', (e) => {
           const val = e.target.value;
@@ -1155,16 +1718,6 @@
           elements.searchHint.textContent = '';
           handleSearchChange('');
           elements.searchInput.focus();
-        });
-
-        elements.provinceSelect.addEventListener('change', (e) => {
-          state.selectedProvince = e.target.value;
-          applyFilters();
-        });
-
-        elements.storeSelect.addEventListener('change', (e) => {
-          state.selectedStore = e.target.value;
-          applyFilters();
         });
 
         elements.resetFiltersLink.addEventListener('click', resetAllFilters);
@@ -1189,18 +1742,19 @@
 
       function applyFilters() {
         const queryLower = state.searchQuery.toLowerCase();
-        const provFilter = state.selectedProvince;
-        const storeFilter = state.selectedStore;
 
         state.filteredBranches = state.allBranches.filter(branch => {
-          if (provFilter && branch.province !== provFilter) {
+          // Province Multi-select match
+          if (state.selectedProvinces.size > 0 && !state.selectedProvinces.has(branch.province)) {
             return false;
           }
 
-          if (storeFilter && branch.store !== storeFilter) {
+          // Store Multi-select match
+          if (state.selectedStores.size > 0 && !state.selectedStores.has(branch.store)) {
             return false;
           }
 
+          // Global Search (≥ 3 characters)
           if (queryLower) {
             const searchableText = [
               branch.id,
@@ -1219,7 +1773,7 @@
           return true;
         });
 
-        const hasActiveFilter = Boolean(state.searchQuery || state.selectedProvince || state.selectedStore);
+        const hasActiveFilter = Boolean(state.searchQuery || state.selectedProvinces.size > 0 || state.selectedStores.size > 0);
         elements.resetFiltersLink.style.display = hasActiveFilter ? 'inline-block' : 'none';
 
         renderBranchList();
@@ -1231,13 +1785,13 @@
         elements.searchInput.value = '';
         elements.searchClearBtn.style.display = 'none';
         elements.searchHint.textContent = '';
-        elements.provinceSelect.value = '';
-        elements.storeSelect.value = '';
-
+        
         state.searchQuery = '';
-        state.selectedProvince = '';
-        state.selectedStore = '';
+        state.selectedProvinces.clear();
+        state.selectedStores.clear();
 
+        renderDropdownOptions();
+        updateTriggerButtons();
         applyFilters();
       }
 
