@@ -968,24 +968,39 @@
       margin-bottom: 10px;
     }
 
-    .popup-btn-nav {
+    .leaflet-popup-content a.popup-btn-nav,
+    .popup-btn-nav,
+    .popup-btn-nav:visited,
+    .popup-btn-nav:hover,
+    .popup-btn-nav:active {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
       width: 100%;
-      height: 32px;
-      background: var(--color-primary);
-      color: #ffffff;
-      font-size: 12px;
+      height: 34px;
+      background-color: var(--color-primary) !important;
+      color: #ffffff !important;
+      font-size: 13px;
       font-weight: 600;
       border-radius: var(--radius-sm);
-      text-decoration: none;
+      text-decoration: none !important;
       transition: background-color var(--transition-fast);
+      box-sizing: border-box;
     }
 
+    .leaflet-popup-content a.popup-btn-nav svg,
+    .popup-btn-nav svg {
+      stroke: #ffffff !important;
+      color: #ffffff !important;
+      fill: none;
+      flex-shrink: 0;
+    }
+
+    .leaflet-popup-content a.popup-btn-nav:hover,
     .popup-btn-nav:hover {
-      background: var(--color-primary-hover);
+      background-color: var(--color-primary-hover) !important;
+      color: #ffffff !important;
     }
 
     /* Mobile Map Bottom Preview Card */
