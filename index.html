@@ -64,6 +64,10 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    button, input, select, textarea, optgroup {
+      font-family: inherit;
+    }
+
     body {
       font-family: var(--font-family);
       background-color: var(--color-background);
@@ -567,7 +571,8 @@
     }
 
     .reset-filters-link {
-      font-size: 12px;
+      font-family: 'Prompt', var(--font-family);
+      font-size: 13px;
       font-weight: 500;
       color: var(--color-primary);
       background: none;
@@ -575,10 +580,15 @@
       cursor: pointer;
       text-decoration: underline;
       display: none;
+      outline: none;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition-fast);
     }
 
     .reset-filters-link:hover {
       color: var(--color-primary-hover);
+      background-color: var(--color-primary-soft);
     }
 
     /* Branch List Scroll Area */

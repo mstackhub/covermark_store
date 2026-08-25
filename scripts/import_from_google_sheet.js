@@ -104,19 +104,34 @@ function findHeaderIndex(headers, possibleNames) {
   return -1;
 }
 
+function cleanText(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/[\u200B-\u200D\uFEFF\uFFFD]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function normalizeProvince(name) {
   if (!name) return '';
-  let p = name.trim().replace(/[\u200B-\u200D\uFEFF\uFFFD]/g, '');
+  let p = cleanText(name);
   if (p.includes('ราชสี') || p.includes('นครราช')) return 'นครราชสีมา';
   if (p === 'สุราษฏร์ธานี') return 'สุราษฎร์ธานี';
   return p;
+}
+
+function normalizeBranchName(name) {
+  if (!name) return '';
+  let n = cleanText(name);
+  if (n.includes('กนกกาญจน์')) return 'ห้างกนกกาญจน์ กาญจนบุรี';
+  return n;
 }
 
 function getVal(row, index) {
   if (index === -1 || index >= row.length || row[index] === undefined || row[index] === null) {
     return '';
   }
-  return String(row[index]).trim();
+  return cleanText(row[index]);
 }
 
 async function importFromGoogleSheet() {
@@ -186,7 +201,7 @@ async function importFromGoogleSheet() {
 
       let id = getVal(row, headerMap.id);
       const store = getVal(row, headerMap.store);
-      const branchName = getVal(row, headerMap.name);
+      const branchName = normalizeBranchName(getVal(row, headerMap.name));
       let province = normalizeProvince(getVal(row, headerMap.province));
       if (!province && branchName.includes('นครราชสีมา')) {
         province = 'นครราชสีมา';
