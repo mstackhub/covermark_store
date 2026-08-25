@@ -873,8 +873,8 @@
             type="text" 
             id="searchInput" 
             class="search-input" 
-            placeholder="ค้นหาชื่อสาขา จังหวัด หรือ Store"
-            aria-label="ค้นหาชื่อสาขา จังหวัด หรือ Store"
+            placeholder="ค้นหาชื่อสาขา หรือจังหวัด"
+            aria-label="ค้นหาชื่อสาขา หรือจังหวัด"
             autocomplete="off"
           >
           <button id="searchClearBtn" class="search-clear-btn" aria-label="ล้างการค้นหา">
@@ -901,10 +901,10 @@
             </svg>
           </div>
 
-          <!-- Store Filter -->
+          <!-- Store / Branch Filter -->
           <div class="select-wrapper">
-            <select id="storeSelect" class="custom-select" aria-label="เลือกกลุ่มห้าง">
-              <option value="">Store ทั้งหมด</option>
+            <select id="storeSelect" class="custom-select" aria-label="เลือกสาขา">
+              <option value="">สาขาทั้งหมด</option>
             </select>
             <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 12 15 18 9"></polyline>
@@ -1121,7 +1121,7 @@
           elements.provinceSelect.appendChild(opt);
         });
 
-        elements.storeSelect.innerHTML = '<option value="">Store ทั้งหมด</option>';
+        elements.storeSelect.innerHTML = '<option value="">สาขาทั้งหมด</option>';
         stores.forEach(store => {
           const opt = document.createElement('option');
           opt.value = store;
@@ -1251,7 +1251,7 @@
                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
               </svg>
               <div class="empty-title">ไม่พบสาขาที่ตรงกับการค้นหา</div>
-              <div class="empty-desc">ลองเปลี่ยนคำค้นหา หรือเลือกจังหวัด/Store อื่น</div>
+              <div class="empty-desc">ลองเปลี่ยนคำค้นหา หรือเลือกจังหวัด/สาขาอื่น</div>
               <button type="button" class="btn-reset" onclick="document.getElementById('resetFiltersLink').click()">ล้างตัวกรอง</button>
             </div>
           `;
