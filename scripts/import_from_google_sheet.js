@@ -104,6 +104,14 @@ function findHeaderIndex(headers, possibleNames) {
   return -1;
 }
 
+function normalizeProvince(name) {
+  if (!name) return '';
+  let p = name.trim().replace(/[\u200B-\u200D\uFEFF\uFFFD]/g, '');
+  if (p.includes('ราชสี') || p.includes('นครราช')) return 'นครราชสีมา';
+  if (p === 'สุราษฏร์ธานี') return 'สุราษฎร์ธานี';
+  return p;
+}
+
 function getVal(row, index) {
   if (index === -1 || index >= row.length || row[index] === undefined || row[index] === null) {
     return '';
@@ -179,7 +187,10 @@ async function importFromGoogleSheet() {
       let id = getVal(row, headerMap.id);
       const store = getVal(row, headerMap.store);
       const branchName = getVal(row, headerMap.name);
-      const province = getVal(row, headerMap.province);
+      let province = normalizeProvince(getVal(row, headerMap.province));
+      if (!province && branchName.includes('นครราชสีมา')) {
+        province = 'นครราชสีมา';
+      }
       const floor = getVal(row, headerMap.floor);
       const phone = getVal(row, headerMap.phone);
       const rawLat = getVal(row, headerMap.lat);
