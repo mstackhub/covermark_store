@@ -78,7 +78,7 @@ app.get('/api/branches', async (req, res) => {
         lng,
         map_url
       FROM branches
-      WHERE status = 'Active'
+      WHERE LOWER(TRIM(status)) = 'active'
       ORDER BY store ASC, branch_name ASC;
     `;
 
