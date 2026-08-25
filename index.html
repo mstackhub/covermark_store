@@ -1107,11 +1107,19 @@
       }
 
       function populateFilters() {
-        const provinces = [...new Set(state.allBranches.map(b => b.province).filter(Boolean))]
-          .sort((a, b) => a.localeCompare(b, 'th'));
+        // Extract only unique, non-empty provinces that actually have active branches
+        const provinces = [...new Set(
+          state.allBranches
+            .map(b => (b.province || '').trim())
+            .filter(p => p.length > 0 && p !== '-' && p !== 'null')
+        )].sort((a, b) => a.localeCompare(b, 'th'));
 
-        const stores = [...new Set(state.allBranches.map(b => b.store).filter(Boolean))]
-          .sort((a, b) => a.localeCompare(b, 'th'));
+        // Extract only unique, non-empty stores that actually have active branches
+        const stores = [...new Set(
+          state.allBranches
+            .map(b => (b.store || '').trim())
+            .filter(s => s.length > 0 && s !== '-' && s !== 'null')
+        )].sort((a, b) => a.localeCompare(b, 'th'));
 
         elements.provinceSelect.innerHTML = '<option value="">จังหวัดทั้งหมด</option>';
         provinces.forEach(prov => {
