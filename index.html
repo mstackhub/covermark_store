@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>COVERMARK | ค้นหาสาขา Store Locator</title>
+  
+  <!-- Typography (Google Fonts: Prompt & Inter for Premium Clean Aesthetics) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet.js Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <style>
+    /* ==========================================================================
+       1. CSS VARIABLES & THEME (COVERMARK BRAND CI #1D4A37)
+       ========================================================================== */
+    :root {
+      --color-primary: #1d4a37;
+      --color-primary-hover: #163a2b;
+      --color-primary-soft: #eef3f0;
+
+      --color-background: #ffffff;
+      --color-surface: #ffffff;
+      --color-surface-soft: #f7f8f7;
+
+      --color-text-primary: #1f2421;
+      --color-text-secondary: #667069;
+      --color-text-muted: #8b938e;
+
+      --color-border: #e3e7e4;
+      --color-border-light: #f0f2f0;
+      --color-success: #238636;
+
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+
+      --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+      --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-hover: 0 4px 14px rgba(29, 74, 55, 0.08);
+      --shadow-popup: 0 6px 20px rgba(0, 0, 0, 0.12);
+
+      --font-family: 'Prompt', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --transition-fast: 0.18s ease;
+      --transition-normal: 0.25s ease;
+    }
+
+    /* Reset & Base Styles */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-background);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* App Container Layout */
+    .app-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ==========================================================================
+       2. SIDEBAR (DESKTOP: ~35-38%, SCROLLABLE)
+       ========================================================================== */
+    .sidebar {
+      width: 420px;
+      min-width: 380px;
+      max-width: 480px;
+      height: 100%;
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      z-index: 20;
+      position: relative;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02);
+    }
+
+    /* Header & Branding */
+    .sidebar-header {
+      padding: 24px 24px 16px;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .brand-logo-img {
+      height: 24px;
+      width: auto;
+      max-width: 210px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .brand-title {
+      display: none;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--color-text-secondary);
+      letter-spacing: 0.02em;
+    }
+
+    /* Search & Filter Controls */
+    .controls-container {
+      padding: 16px 24px;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      width: 18px;
+      height: 18px;
+      color: var(--color-text-muted);
+      pointer-events: none;
+      transition: color var(--transition-fast);
+    }
+
+    .search-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 40px 0 42px;
+      font-family: var(--font-family);
+      font-size: 14px;
+      color: var(--color-text-primary);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .search-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(29, 74, 55, 0.10);
+    }
+
+    .search-input:focus + .search-icon {
+      color: var(--color-primary);
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+
+    .search-clear-btn:hover {
+      background: var(--color-surface-soft);
+      color: var(--color-text-primary);
+    }
+
+    .search-hint {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-top: -6px;
+      padding-left: 4px;
+      min-height: 18px;
+    }
+
+    .filters-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    .custom-select {
+      width: 100%;
+      height: 40px;
+      padding: 0 32px 0 12px;
+      font-family: var(--font-family);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+      cursor: pointer;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .custom-select:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(29, 74, 55, 0.10);
+    }
+
+    .select-chevron {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: var(--color-text-muted);
+      pointer-events: none;
+      transition: transform var(--transition-fast);
+    }
+
+    /* Mobile View Toggle Buttons */
+    .mobile-view-toggle {
+      display: none; /* hidden on desktop */
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: var(--color-surface-soft);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      margin-top: 4px;
+    }
+
+    .toggle-btn {
+      padding: 8px 12px;
+      font-family: var(--font-family);
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--color-text-secondary);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+    }
+
+    .toggle-btn.active {
+      background: var(--color-primary);
+      color: #ffffff;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    /* Result Bar & Counter */
+    .results-bar {
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--color-surface-soft);
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .results-count-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+    }
+
+    .results-count-number {
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .reset-filters-link {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      display: none;
+    }
+
+    .reset-filters-link:hover {
+      color: var(--color-primary-hover);
+    }
+
+    /* Branch List Scroll Area */
+    .branch-list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+
+    .branch-list-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .branch-list-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .branch-list-container::-webkit-scrollbar-thumb {
+      background: var(--color-border);
+      border-radius: 4px;
+    }
+    .branch-list-container::-webkit-scrollbar-thumb:hover {
+      background: var(--color-text-muted);
+    }
+
+    /* ==========================================================================
+       3. BRANCH CARD COMPONENT (PREMIUM BEAUTY EDITORIAL STYLE)
+       ========================================================================== */
+    .branch-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .branch-card:hover {
+      border-color: #cbd5ce;
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Active Selected Card State */
+    .branch-card.is-active {
+      border-left: 4px solid var(--color-primary) !important;
+      border-color: #c2d6cc;
+      background: var(--color-primary-soft);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .store-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .branch-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      line-height: 1.35;
+      margin-top: 2px;
+    }
+
+    .branch-location {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .branch-phone-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-primary);
+      margin-top: 2px;
+    }
+
+    .branch-phone-link {
+      color: var(--color-primary);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    .branch-phone-link:hover {
+      text-decoration: underline;
+      color: var(--color-primary-hover);
+    }
+
+    .card-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+      padding-top: 10px;
+      border-top: 1px solid var(--color-border-light);
+    }
+
+    .btn-action {
+      height: 36px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-family);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: none;
+    }
+
+    .btn-call {
+      background: #ffffff;
+      border: 1px solid var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    .btn-call:hover {
+      background: var(--color-primary-soft);
+      border-color: var(--color-primary);
+    }
+
+    .btn-navigate {
+      background: var(--color-primary);
+      color: #ffffff;
+    }
+
+    .btn-navigate:hover {
+      background: var(--color-primary-hover);
+      color: #ffffff;
+    }
+
+    .btn-disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+
+    /* ==========================================================================
+       4. EMPTY, SKELETON & ERROR STATES
+       ========================================================================== */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--color-text-secondary);
+    }
+
+    .empty-icon {
+      width: 48px;
+      height: 48px;
+      color: var(--color-text-muted);
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+
+    .empty-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 6px;
+    }
+
+    .empty-desc {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .btn-reset {
+      padding: 8px 18px;
+      font-family: var(--font-family);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-primary);
+      background: var(--color-primary-soft);
+      border: 1px solid rgba(29, 74, 55, 0.2);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-reset:hover {
+      background: var(--color-primary);
+      color: #ffffff;
+    }
+
+    /* Skeleton Loading */
+    .skeleton-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .skeleton-line {
+      height: 12px;
+      background: linear-gradient(90deg, #f0f2f0 25%, #e6eae7 50%, #f0f2f0 75%);
+      background-size: 200% 100%;
+      border-radius: 4px;
+      animation: shimmer 1.5s infinite;
+    }
+
+    .skeleton-title {
+      height: 18px;
+      width: 70%;
+    }
+
+    .skeleton-subtitle {
+      height: 12px;
+      width: 45%;
+    }
+
+    .skeleton-actions {
+      height: 34px;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Error Box */
+    .error-box {
+      margin: 20px;
+      padding: 24px;
+      background: #fdf5f5;
+      border: 1px solid #fad2d2;
+      border-radius: var(--radius-md);
+      text-align: center;
+      color: #b3261e;
+    }
+
+    .error-box p {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .error-box button {
+      margin-top: 14px;
+      padding: 8px 20px;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-family);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+
+    .error-box button:hover {
+      background: var(--color-primary-hover);
+    }
+
+    /* ==========================================================================
+       5. MAP SECTION (DESKTOP: ~65% FULL HEIGHT)
+       ========================================================================== */
+    .map-container-wrap {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background: #f4f6f4;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+    }
+
+    /* Custom Leaflet Markers */
+    .custom-marker {
+      background: transparent;
+      border: none;
+    }
+
+    .marker-pin {
+      width: 32px;
+      height: 32px;
+      background: #ffffff;
+      border: 2.5px solid var(--color-primary);
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+      transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+      cursor: pointer;
+    }
+
+    .marker-pin::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: var(--color-primary);
+      border-radius: 50%;
+      transform: rotate(45deg);
+      transition: background-color 0.2s ease;
+    }
+
+    .custom-marker:hover .marker-pin {
+      transform: rotate(-45deg) scale(1.12);
+      box-shadow: 0 6px 14px rgba(29, 74, 55, 0.3);
+    }
+
+    /* Selected Active Marker */
+    .custom-marker.active-marker .marker-pin {
+      background: var(--color-primary);
+      border-color: #ffffff;
+      transform: rotate(-45deg) scale(1.22);
+      box-shadow: 0 8px 18px rgba(29, 74, 55, 0.45);
+      z-index: 1000 !important;
+    }
+
+    .custom-marker.active-marker .marker-pin::after {
+      background: #ffffff;
+    }
+
+    /* Custom Leaflet Popup */
+    .leaflet-popup-content-wrapper {
+      padding: 0;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-popup);
+      border: 1px solid var(--color-border);
+      overflow: hidden;
+    }
+
+    .leaflet-popup-content {
+      margin: 0;
+      line-height: 1.4;
+      font-family: var(--font-family);
+    }
+
+    .popup-inner {
+      padding: 14px 16px;
+      min-width: 220px;
+      max-width: 270px;
+    }
+
+    .popup-store {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .popup-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 4px;
+    }
+
+    .popup-desc {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .popup-btn-nav {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      height: 32px;
+      background: var(--color-primary);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: background-color var(--transition-fast);
+    }
+
+    .popup-btn-nav:hover {
+      background: var(--color-primary-hover);
+    }
+
+    /* Mobile Map Bottom Preview Card */
+    .mobile-selected-card-bar {
+      display: none;
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 30;
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--color-border);
+      padding: 14px 16px;
+      animation: slideUp 0.25s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ==========================================================================
+       6. RESPONSIVE BREAKPOINTS (<= 768px MOBILE & TABLET)
+       ========================================================================== */
+    @media (max-width: 768px) {
+      body {
+        height: auto;
+        overflow: auto;
+      }
+
+      .app-container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+      }
+
+      .sidebar {
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        height: auto;
+        border-right: none;
+        box-shadow: none;
+      }
+
+      .sidebar-header {
+        padding: 18px 16px 12px;
+      }
+
+      .brand-title {
+        font-size: 20px;
+      }
+
+      .controls-container {
+        padding: 12px 16px;
+        gap: 10px;
+      }
+
+      .filters-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .mobile-view-toggle {
+        display: grid;
+      }
+
+      .results-bar {
+        padding: 10px 16px;
+      }
+
+      .branch-list-container {
+        padding: 12px 16px;
+        height: auto;
+        max-height: none;
+        overflow: visible;
+      }
+
+      .map-container-wrap {
+        height: 68vh;
+        min-height: 400px;
+        display: none;
+      }
+
+      .app-container.view-list .sidebar {
+        display: flex;
+      }
+      .app-container.view-list .map-container-wrap {
+        display: none;
+      }
+
+      .app-container.view-map .sidebar-header,
+      .app-container.view-map .controls-container {
+        display: flex;
+      }
+      .app-container.view-map .results-bar,
+      .app-container.view-map .branch-list-container {
+        display: none;
+      }
+      .app-container.view-map .map-container-wrap {
+        display: block;
+      }
+      .app-container.view-map .mobile-selected-card-bar.has-selection {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container view-list" id="appContainer">
+    
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="sidebar">
+      
+      <!-- Brand Header -->
+      <header class="sidebar-header">
+        <div class="brand-logo-wrap">
+          <img src="logo.png" alt="COVERMARK" class="brand-logo-img">
+        </div>
+        <p class="brand-subtitle">ค้นหาสาขา COVERMARK</p>
+      </header>
+
+      <!-- Search & Filters Container -->
+      <div class="controls-container">
+        
+        <!-- Search Input -->
+        <div class="search-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            type="text" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="ค้นหาชื่อสาขา จังหวัด หรือ Store"
+            aria-label="ค้นหาชื่อสาขา จังหวัด หรือ Store"
+            autocomplete="off"
+          >
+          <button id="searchClearBtn" class="search-clear-btn" aria-label="ล้างการค้นหา">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Search Hint (Minimum 3 characters) -->
+        <div id="searchHint" class="search-hint"></div>
+
+        <!-- Filter Dropdowns -->
+        <div class="filters-row">
+          
+          <!-- Province Filter -->
+          <div class="select-wrapper">
+            <select id="provinceSelect" class="custom-select" aria-label="เลือกจังหวัด">
+              <option value="">จังหวัดทั้งหมด</option>
+            </select>
+            <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+
+          <!-- Store Filter -->
+          <div class="select-wrapper">
+            <select id="storeSelect" class="custom-select" aria-label="เลือกกลุ่มห้าง">
+              <option value="">Store ทั้งหมด</option>
+            </select>
+            <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+
+        </div>
+
+        <!-- Mobile List / Map Tab Toggle -->
+        <div class="mobile-view-toggle">
+          <button type="button" class="toggle-btn active" id="btnToggleList">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            รายชื่อ
+          </button>
+          <button type="button" class="toggle-btn" id="btnToggleMap">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+              <line x1="8" y1="2" x2="8" y2="18"></line>
+              <line x1="16" y1="6" x2="16" y2="22"></line>
+            </svg>
+            แผนที่
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Results Count Bar -->
+      <div class="results-bar">
+        <span class="results-count-text" id="resultCounter">กำลังโหลดข้อมูลสาขา...</span>
+        <button class="reset-filters-link" id="resetFiltersLink">ล้างตัวกรอง</button>
+      </div>
+
+      <!-- Branch Cards List Container -->
+      <div class="branch-list-container" id="branchListContainer">
+        <!-- Skeleton Loaders -->
+        <div class="skeleton-card">
+          <div class="skeleton-line skeleton-subtitle"></div>
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-line skeleton-subtitle"></div>
+          <div class="skeleton-line skeleton-actions"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-line skeleton-subtitle"></div>
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-line skeleton-subtitle"></div>
+          <div class="skeleton-line skeleton-actions"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-line skeleton-subtitle"></div>
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-line skeleton-subtitle"></div>
+          <div class="skeleton-line skeleton-actions"></div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ==================== MAP CONTAINER ==================== -->
+    <main class="map-container-wrap">
+      <div id="map"></div>
+
+      <!-- Mobile Selected Branch Preview Overlay -->
+      <div class="mobile-selected-card-bar" id="mobileSelectedCard">
+        <div id="mobileCardContent"></div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Leaflet.js Map Library -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <script>
+    /**
+     * COVERMARK Store Locator - Turso Database Backend Integration
+     */
+    (function() {
+      const state = {
+        allBranches: [],
+        filteredBranches: [],
+        selectedBranchId: null,
+        searchQuery: '',
+        selectedProvince: '',
+        selectedStore: '',
+        activeView: 'list',
+        map: null,
+        markersMap: new Map(),
+        debounceTimer: null
+      };
+
+      const elements = {
+        appContainer: document.getElementById('appContainer'),
+        searchInput: document.getElementById('searchInput'),
+        searchClearBtn: document.getElementById('searchClearBtn'),
+        searchHint: document.getElementById('searchHint'),
+        provinceSelect: document.getElementById('provinceSelect'),
+        storeSelect: document.getElementById('storeSelect'),
+        resultCounter: document.getElementById('resultCounter'),
+        resetFiltersLink: document.getElementById('resetFiltersLink'),
+        branchListContainer: document.getElementById('branchListContainer'),
+        btnToggleList: document.getElementById('btnToggleList'),
+        btnToggleMap: document.getElementById('btnToggleMap'),
+        mobileSelectedCard: document.getElementById('mobileSelectedCard'),
+        mobileCardContent: document.getElementById('mobileCardContent')
+      };
+
+      document.addEventListener('DOMContentLoaded', () => {
+        initMap();
+        bindEvents();
+        fetchBranches();
+      });
+
+      function initMap() {
+        state.map = L.map('map', {
+          zoomControl: false,
+          attributionControl: false
+        }).setView([13.7563, 100.5018], 11);
+
+        L.control.zoom({
+          position: 'topright'
+        }).addTo(state.map);
+
+        L.control.attribution({
+          position: 'bottomright',
+          prefix: false
+        }).addAttribution('&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>').addTo(state.map);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          maxZoom: 19,
+          subdomains: 'abcd'
+        }).addTo(state.map);
+      }
+
+      async function fetchBranches() {
+        try {
+          const response = await fetch('/api/branches');
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const json = await response.json();
+          
+          if (!json.success || !Array.isArray(json.data)) {
+            throw new Error(json.message || 'Failed to load branches data');
+          }
+
+          onDataLoaded(json.data);
+        } catch (error) {
+          console.warn('API fetch failed or offline. Checking fallback...', error.message);
+          
+          if (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+            console.info('Loading fallback COVERMARK dataset for preview.');
+            onDataLoaded(getMockBranches());
+          } else {
+            onDataError(error);
+          }
+        }
+      }
+
+      function onDataLoaded(data) {
+        state.allBranches = data.map(b => ({
+          id: String(b.id || '').trim(),
+          store: String(b.store || '').trim(),
+          branchName: String(b.branchName || b.name || '').trim(),
+          province: String(b.province || '').trim(),
+          floor: b.floor ? String(b.floor).trim() : '',
+          phone: b.phone ? String(b.phone).trim() : '',
+          lat: b.lat !== null && b.lat !== '' && !isNaN(Number(b.lat)) ? Number(b.lat) : null,
+          lng: (b.lng !== undefined && b.lng !== null && b.lng !== '' && !isNaN(Number(b.lng))) 
+                ? Number(b.lng) 
+                : (b.long !== undefined && b.long !== null && !isNaN(Number(b.long)) ? Number(b.long) : null),
+          mapUrl: String(b.mapUrl || b.link || '').trim()
+        })).filter(b => b.id && b.branchName);
+
+        state.filteredBranches = [...state.allBranches];
+
+        populateFilters();
+        renderBranchList();
+        renderMapMarkers();
+        fitMapToMarkers();
+      }
+
+      function onDataError(err) {
+        console.error('Data Error:', err);
+        elements.resultCounter.textContent = 'เกิดข้อผิดพลาด';
+        elements.branchListContainer.innerHTML = `
+          <div class="error-box">
+            <p>ไม่สามารถโหลดข้อมูลสาขาได้<br>กรุณาลองใหม่อีกครั้ง</p>
+            <button type="button" onclick="location.reload()">ลองใหม่</button>
+          </div>
+        `;
+      }
+
+      function populateFilters() {
+        const provinces = [...new Set(state.allBranches.map(b => b.province).filter(Boolean))]
+          .sort((a, b) => a.localeCompare(b, 'th'));
+
+        const stores = [...new Set(state.allBranches.map(b => b.store).filter(Boolean))]
+          .sort((a, b) => a.localeCompare(b, 'th'));
+
+        elements.provinceSelect.innerHTML = '<option value="">จังหวัดทั้งหมด</option>';
+        provinces.forEach(prov => {
+          const opt = document.createElement('option');
+          opt.value = prov;
+          opt.textContent = prov;
+          elements.provinceSelect.appendChild(opt);
+        });
+
+        elements.storeSelect.innerHTML = '<option value="">Store ทั้งหมด</option>';
+        stores.forEach(store => {
+          const opt = document.createElement('option');
+          opt.value = store;
+          opt.textContent = store;
+          elements.storeSelect.appendChild(opt);
+        });
+      }
+
+      function bindEvents() {
+        elements.searchInput.addEventListener('input', (e) => {
+          const val = e.target.value;
+          elements.searchClearBtn.style.display = val.length > 0 ? 'flex' : 'none';
+
+          clearTimeout(state.debounceTimer);
+          state.debounceTimer = setTimeout(() => {
+            handleSearchChange(val);
+          }, 300);
+        });
+
+        elements.searchClearBtn.addEventListener('click', () => {
+          elements.searchInput.value = '';
+          elements.searchClearBtn.style.display = 'none';
+          elements.searchHint.textContent = '';
+          handleSearchChange('');
+          elements.searchInput.focus();
+        });
+
+        elements.provinceSelect.addEventListener('change', (e) => {
+          state.selectedProvince = e.target.value;
+          applyFilters();
+        });
+
+        elements.storeSelect.addEventListener('change', (e) => {
+          state.selectedStore = e.target.value;
+          applyFilters();
+        });
+
+        elements.resetFiltersLink.addEventListener('click', resetAllFilters);
+
+        elements.btnToggleList.addEventListener('click', () => setMobileView('list'));
+        elements.btnToggleMap.addEventListener('click', () => setMobileView('map'));
+      }
+
+      function handleSearchChange(rawValue) {
+        const query = rawValue.trim();
+
+        if (query.length > 0 && query.length < 3) {
+          elements.searchHint.textContent = 'พิมพ์อย่างน้อย 3 ตัวอักษรเพื่อค้นหา';
+          state.searchQuery = '';
+        } else {
+          elements.searchHint.textContent = '';
+          state.searchQuery = query;
+        }
+
+        applyFilters();
+      }
+
+      function applyFilters() {
+        const queryLower = state.searchQuery.toLowerCase();
+        const provFilter = state.selectedProvince;
+        const storeFilter = state.selectedStore;
+
+        state.filteredBranches = state.allBranches.filter(branch => {
+          if (provFilter && branch.province !== provFilter) {
+            return false;
+          }
+
+          if (storeFilter && branch.store !== storeFilter) {
+            return false;
+          }
+
+          if (queryLower) {
+            const searchableText = [
+              branch.id,
+              branch.store,
+              branch.branchName,
+              branch.province,
+              branch.floor,
+              branch.phone
+            ].filter(Boolean).join(' ').toLowerCase();
+
+            if (!searchableText.includes(queryLower)) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+
+        const hasActiveFilter = Boolean(state.searchQuery || state.selectedProvince || state.selectedStore);
+        elements.resetFiltersLink.style.display = hasActiveFilter ? 'inline-block' : 'none';
+
+        renderBranchList();
+        renderMapMarkers();
+        fitMapToMarkers();
+      }
+
+      function resetAllFilters() {
+        elements.searchInput.value = '';
+        elements.searchClearBtn.style.display = 'none';
+        elements.searchHint.textContent = '';
+        elements.provinceSelect.value = '';
+        elements.storeSelect.value = '';
+
+        state.searchQuery = '';
+        state.selectedProvince = '';
+        state.selectedStore = '';
+
+        applyFilters();
+      }
+
+      function renderBranchList() {
+        const total = state.filteredBranches.length;
+
+        if (total > 0) {
+          elements.resultCounter.innerHTML = `พบ <span class="results-count-number">${total}</span> สาขา`;
+        } else {
+          elements.resultCounter.innerHTML = `พบ <span class="results-count-number">0</span> สาขา`;
+        }
+
+        if (total === 0) {
+          elements.branchListContainer.innerHTML = `
+            <div class="empty-state">
+              <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <div class="empty-title">ไม่พบสาขาที่ตรงกับการค้นหา</div>
+              <div class="empty-desc">ลองเปลี่ยนคำค้นหา หรือเลือกจังหวัด/Store อื่น</div>
+              <button type="button" class="btn-reset" onclick="document.getElementById('resetFiltersLink').click()">ล้างตัวกรอง</button>
+            </div>
+          `;
+          return;
+        }
+
+        const html = state.filteredBranches.map(branch => createBranchCardHTML(branch)).join('');
+        elements.branchListContainer.innerHTML = html;
+
+        if (state.selectedBranchId) {
+          highlightCard(state.selectedBranchId, false);
+        }
+      }
+
+      function createBranchCardHTML(branch) {
+        const isActive = branch.id === state.selectedBranchId;
+        
+        const locationParts = [];
+        if (branch.province) locationParts.push(escapeHTML(branch.province));
+        if (branch.floor) locationParts.push('ชั้น ' + escapeHTML(branch.floor));
+        const locationStr = locationParts.join(' · ');
+
+        const cleanPhone = (branch.phone || '').replace(/[^0-9+]/g, '');
+        const phoneHTML = branch.phone ? `
+          <div class="branch-phone-row">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            <a href="tel:${cleanPhone}" class="branch-phone-link" onclick="event.stopPropagation()">${escapeHTML(branch.phone)}</a>
+          </div>
+        ` : '';
+
+        const callBtnHTML = cleanPhone ? `
+          <a href="tel:${cleanPhone}" class="btn-action btn-call" aria-label="โทรหาสาขา ${escapeHTML(branch.branchName)}" onclick="event.stopPropagation()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            โทร
+          </a>
+        ` : `
+          <button class="btn-action btn-call btn-disabled" disabled>โทร</button>
+        `;
+
+        const navBtnHTML = branch.mapUrl ? `
+          <a href="${escapeHTML(branch.mapUrl)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-navigate" aria-label="นำทางไปสาขา ${escapeHTML(branch.branchName)}" onclick="event.stopPropagation()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+            </svg>
+            นำทาง
+          </a>
+        ` : `
+          <button class="btn-action btn-navigate btn-disabled" disabled>นำทาง</button>
+        `;
+
+        return `
+          <div class="branch-card ${isActive ? 'is-active' : ''}" id="card-${branch.id}" onclick="window.selectBranch('${branch.id}', true)">
+            <div class="card-top-row">
+              <span class="store-badge">${escapeHTML(branch.store || 'COVERMARK')}</span>
+            </div>
+            <div class="branch-name">${escapeHTML(branch.branchName)}</div>
+            ${locationStr ? `<div class="branch-location">${locationStr}</div>` : ''}
+            ${phoneHTML}
+            <div class="card-actions">
+              ${callBtnHTML}
+              ${navBtnHTML}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderMapMarkers() {
+        state.markersMap.forEach(marker => {
+          state.map.removeLayer(marker);
+        });
+        state.markersMap.clear();
+
+        state.filteredBranches.forEach(branch => {
+          if (!isValidCoordinate(branch.lat, branch.lng)) {
+            return;
+          }
+
+          const isSelected = branch.id === state.selectedBranchId;
+          const markerIcon = createDivIcon(isSelected);
+
+          const marker = L.marker([branch.lat, branch.lng], {
+            icon: markerIcon,
+            title: branch.branchName,
+            riseOnHover: true
+          });
+
+          marker.bindPopup(createPopupHTML(branch), {
+            offset: [0, -18],
+            closeButton: false,
+            autoPanPadding: [20, 20]
+          });
+
+          marker.on('click', () => {
+            selectBranch(branch.id, false);
+          });
+
+          marker.addTo(state.map);
+          state.markersMap.set(branch.id, marker);
+        });
+      }
+
+      function createDivIcon(isActive) {
+        return L.divIcon({
+          className: `custom-marker ${isActive ? 'active-marker' : ''}`,
+          html: `<div class="marker-pin"></div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -30]
+        });
+      }
+
+      function createPopupHTML(branch) {
+        const locationParts = [];
+        if (branch.province) locationParts.push(escapeHTML(branch.province));
+        if (branch.floor) locationParts.push('ชั้น ' + escapeHTML(branch.floor));
+        const locationStr = locationParts.join(' · ');
+
+        const navBtn = branch.mapUrl ? `
+          <a href="${escapeHTML(branch.mapUrl)}" target="_blank" rel="noopener noreferrer" class="popup-btn-nav">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+            </svg>
+            นำทาง
+          </a>
+        ` : '';
+
+        return `
+          <div class="popup-inner">
+            <div class="popup-store">${escapeHTML(branch.store || 'COVERMARK')}</div>
+            <div class="popup-title">${escapeHTML(branch.branchName)}</div>
+            ${locationStr ? `<div class="popup-desc">${locationStr}</div>` : ''}
+            ${navBtn}
+          </div>
+        `;
+      }
+
+      function fitMapToMarkers() {
+        const validBranches = state.filteredBranches.filter(b => isValidCoordinate(b.lat, b.lng));
+        
+        if (validBranches.length === 0) {
+          state.map.setView([13.7563, 100.5018], 11);
+          return;
+        }
+
+        if (validBranches.length === 1) {
+          state.map.setView([validBranches[0].lat, validBranches[0].lng], 16);
+          return;
+        }
+
+        const bounds = L.latLngBounds(validBranches.map(b => [b.lat, b.lng]));
+        state.map.fitBounds(bounds, {
+          padding: [50, 50],
+          maxZoom: 16
+        });
+      }
+
+      window.selectBranch = function(branchId, shouldPanMap) {
+        state.selectedBranchId = branchId;
+        const branch = state.allBranches.find(b => b.id === branchId);
+        if (!branch) return;
+
+        highlightCard(branchId, true);
+        updateActiveMarker(branchId);
+
+        if (shouldPanMap && isValidCoordinate(branch.lat, branch.lng)) {
+          state.map.flyTo([branch.lat, branch.lng], 16, {
+            duration: 0.8
+          });
+          const marker = state.markersMap.get(branchId);
+          if (marker) {
+            setTimeout(() => {
+              marker.openPopup();
+            }, 300);
+          }
+        }
+
+        updateMobilePreviewCard(branch);
+      };
+
+      function highlightCard(branchId, scrollIntoView) {
+        document.querySelectorAll('.branch-card.is-active').forEach(card => {
+          card.classList.remove('is-active');
+        });
+
+        const targetCard = document.getElementById(`card-${branchId}`);
+        if (targetCard) {
+          targetCard.classList.add('is-active');
+          if (scrollIntoView) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }
+      }
+
+      function updateActiveMarker(branchId) {
+        state.markersMap.forEach((marker, id) => {
+          const isTarget = id === branchId;
+          marker.setIcon(createDivIcon(isTarget));
+          if (isTarget) {
+            marker.openPopup();
+          }
+        });
+      }
+
+      function updateMobilePreviewCard(branch) {
+        const locationParts = [];
+        if (branch.province) locationParts.push(escapeHTML(branch.province));
+        if (branch.floor) locationParts.push('ชั้น ' + escapeHTML(branch.floor));
+        const locationStr = locationParts.join(' · ');
+        const cleanPhone = (branch.phone || '').replace(/[^0-9+]/g, '');
+
+        elements.mobileCardContent.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+            <div style="font-size:11px; font-weight:700; color:var(--color-primary); letter-spacing:0.08em; text-transform:uppercase;">
+              ${escapeHTML(branch.store || 'COVERMARK')}
+            </div>
+            <button onclick="document.getElementById('mobileSelectedCard').classList.remove('has-selection')" style="background:none;border:none;color:var(--color-text-muted);cursor:pointer;font-size:14px;">
+              ✕
+            </button>
+          </div>
+          <div style="font-size:15px; font-weight:600; color:var(--color-text-primary); margin-bottom:2px;">
+            ${escapeHTML(branch.branchName)}
+          </div>
+          <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:8px;">
+            ${locationStr}
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            ${cleanPhone ? `<a href="tel:${cleanPhone}" class="btn-action btn-call" style="height:32px;font-size:12px;">โทร</a>` : ''}
+            ${branch.mapUrl ? `<a href="${escapeHTML(branch.mapUrl)}" target="_blank" class="btn-action btn-navigate" style="height:32px;font-size:12px;">นำทาง</a>` : ''}
+          </div>
+        `;
+
+        elements.mobileSelectedCard.classList.add('has-selection');
+      }
+
+      function setMobileView(view) {
+        state.activeView = view;
+        if (view === 'map') {
+          elements.appContainer.classList.remove('view-list');
+          elements.appContainer.classList.add('view-map');
+          elements.btnToggleMap.classList.add('active');
+          elements.btnToggleList.classList.remove('active');
+
+          setTimeout(() => {
+            state.map.invalidateSize();
+            if (state.selectedBranchId) {
+              const b = state.allBranches.find(item => item.id === state.selectedBranchId);
+              if (b && isValidCoordinate(b.lat, b.lng)) {
+                state.map.setView([b.lat, b.lng], 16);
+              }
+            } else {
+              fitMapToMarkers();
+            }
+          }, 100);
+        } else {
+          elements.appContainer.classList.remove('view-map');
+          elements.appContainer.classList.add('view-list');
+          elements.btnToggleList.classList.add('active');
+          elements.btnToggleMap.classList.remove('active');
+        }
+      }
+
+      function isValidCoordinate(lat, lng) {
+        return lat !== null && lng !== null && lat !== '' && lng !== '' && !isNaN(Number(lat)) && !isNaN(Number(lng));
+      }
+
+      function escapeHTML(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function getMockBranches() {
+        return [
+          {
+            id: 'C001',
+            store: 'Central',
+            branchName: 'ห้างเซ็นทรัล ชิดลม',
+            province: 'กรุงเทพมหานคร',
+            floor: '1',
+            phone: '080-070-5220',
+            lat: 13.744304,
+            lng: 100.544279,
+            mapUrl: 'https://maps.google.com/?q=13.744304,100.544279'
+          },
+          {
+            id: 'C002',
+            store: 'Central',
+            branchName: 'ห้างเซ็นทรัล ลาดพร้าว',
+            province: 'กรุงเทพมหานคร',
+            floor: '1',
+            phone: '080-070-5221',
+            lat: 13.816300,
+            lng: 100.561100,
+            mapUrl: 'https://maps.google.com/?q=13.816300,100.561100'
+          },
+          {
+            id: 'C003',
+            store: 'Central',
+            branchName: 'ห้างเซ็นทรัล ปิ่นเกล้า',
+            province: 'กรุงเทพมหานคร',
+            floor: '1',
+            phone: '080-070-5222',
+            lat: 13.778100,
+            lng: 100.476400,
+            mapUrl: 'https://maps.google.com/?q=13.778100,100.476400'
+          },
+          {
+            id: 'C004',
+            store: 'Central',
+            branchName: 'ห้างเซ็นทรัล บางนา',
+            province: 'กรุงเทพมหานคร',
+            floor: '1',
+            phone: '080-070-5223',
+            lat: 13.668700,
+            lng: 100.634600,
+            mapUrl: 'https://maps.google.com/?q=13.668700,100.634600'
+          },
+          {
+            id: 'C005',
+            store: 'The Mall',
+            branchName: 'เดอะมอลล์ไลฟ์สโตร์ งามวงศ์วาน',
+            province: 'นนทบุรี',
+            floor: '1',
+            phone: '080-070-5224',
+            lat: 13.859600,
+            lng: 100.542000,
+            mapUrl: 'https://maps.google.com/?q=13.859600,100.542000'
+          },
+          {
+            id: 'C006',
+            store: 'The Mall',
+            branchName: 'เดอะมอลล์ไลฟ์สโตร์ ท่าพระ',
+            province: 'กรุงเทพมหานคร',
+            floor: '1',
+            phone: '080-070-5225',
+            lat: 13.713100,
+            lng: 100.479500,
+            mapUrl: 'https://maps.google.com/?q=13.713100,100.479500'
+          },
+          {
+            id: 'C007',
+            store: 'Robinson',
+            branchName: 'โรบินสัน พระราม 9',
+            province: 'กรุงเทพมหานคร',
+            floor: '1',
+            phone: '080-070-5226',
+            lat: 13.757800,
+            lng: 100.565800,
+            mapUrl: 'https://maps.google.com/?q=13.757800,100.565800'
+          },
+          {
+            id: 'C008',
+            store: 'Robinson',
+            branchName: 'โรบินสัน ฟิวเจอร์พาร์ค รังสิต',
+            province: 'ปทุมธานี',
+            floor: 'G',
+            phone: '080-070-5227',
+            lat: 13.989200,
+            lng: 100.617900,
+            mapUrl: 'https://maps.google.com/?q=13.989200,100.617900'
+          },
+          {
+            id: 'C009',
+            store: 'Central',
+            branchName: 'เซ็นทรัล เชียงใหม่ (เฟสติวัล)',
+            province: 'เชียงใหม่',
+            floor: '1',
+            phone: '080-070-5228',
+            lat: 18.802800,
+            lng: 99.018200,
+            mapUrl: 'https://maps.google.com/?q=18.802800,99.018200'
+          },
+          {
+            id: 'C010',
+            store: 'Central',
+            branchName: 'เซ็นทรัล พัทยา บีช',
+            province: 'ชลบุรี',
+            floor: '1',
+            phone: '080-070-5229',
+            lat: 12.934700,
+            lng: 100.883300,
+            mapUrl: 'https://maps.google.com/?q=12.934700,100.883300'
+          },
+          {
+            id: 'C011',
+            store: 'Siam Paragon',
+            branchName: 'สยามพารากอน (Beauty Hall)',
+            province: 'กรุงเทพมหานคร',
+            floor: 'M',
+            phone: '080-070-5230',
+            lat: 13.746000,
+            lng: 100.534800,
+            mapUrl: 'https://maps.google.com/?q=13.746000,100.534800'
+          },
+          {
+            id: 'C012',
+            store: 'Emporium',
+            branchName: 'เอ็มโพเรียม',
+            province: 'กรุงเทพมหานคร',
+            floor: 'M',
+            phone: '080-070-5231',
+            lat: 13.729900,
+            lng: 100.569400,
+            mapUrl: 'https://maps.google.com/?q=13.729900,100.569400'
+          },
+          {
+            id: 'C013',
+            store: 'Central',
+            branchName: 'เซ็นทรัล ขอนแก่น',
+            province: 'ขอนแก่น',
+            floor: '1',
+            phone: '080-070-5232',
+            lat: 16.432200,
+            lng: 102.824200,
+            mapUrl: 'https://maps.google.com/?q=16.432200,102.824200'
+          },
+          {
+            id: 'C014',
+            store: 'Central',
+            branchName: 'เซ็นทรัล ภูเก็ต ฟลอเรสต้า',
+            province: 'ภูเก็ต',
+            floor: '1',
+            phone: '080-070-5233',
+            lat: 7.892000,
+            lng: 98.367000,
+            mapUrl: 'https://maps.google.com/?q=7.892000,98.367000'
+          }
+        ];
+      }
+
+    })();
+  </script>
+</body>
+</html>

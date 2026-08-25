@@ -1,0 +1,30 @@
+{
+  "name": "covermark-store-locator",
+  "version": "2.0.0",
+  "description": "COVERMARK Store Locator Web App with Turso libSQL Database & Leaflet.js",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "db:migrate": "node scripts/migrate.js",
+    "db:seed": "node scripts/seed.js",
+    "db:sync-sheet": "node scripts/import_from_google_sheet.js",
+    "db:setup": "node scripts/migrate.js && node scripts/seed.js"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.14.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "keywords": [
+    "covermark",
+    "store-locator",
+    "turso",
+    "libsql",
+    "leaflet"
+  ],
+  "author": "COVERMARK Thailand",
+  "license": "ISC"
+}
