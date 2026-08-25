@@ -2023,7 +2023,7 @@
           });
 
           marker.bindPopup(createPopupHTML(branch), {
-            offset: [0, -20],
+            offset: [0, -4],
             closeButton: false,
             minWidth: 230,
             maxWidth: 280,
@@ -2045,7 +2045,7 @@
           html: `<div class="marker-pin"></div>`,
           iconSize: [32, 32],
           iconAnchor: [16, 32],
-          popupAnchor: [0, -30]
+          popupAnchor: [0, -32]
         });
       }
 
@@ -2117,19 +2117,18 @@
         if (!branch) return;
 
         highlightCard(branchId, true);
-        updateActiveMarker(branchId);
+
+        // If on mobile screen and in list view, auto switch to map view
+        if (window.innerWidth <= 768 && elements.appContainer.classList.contains('view-list')) {
+          setMobileView('map');
+        }
 
         if (shouldPanMap && isValidCoordinate(branch.lat, branch.lng)) {
-          state.map.flyTo([branch.lat, branch.lng], 16, {
-            duration: 0.8
-          });
-          const marker = state.markersMap.get(branchId);
-          if (marker) {
-            setTimeout(() => {
-              marker.openPopup();
-            }, 300);
-          }
+          state.map.setView([branch.lat, branch.lng], 16, { animate: false });
+          state.map.invalidateSize(true);
         }
+
+        updateActiveMarker(branchId);
       };
 
       function highlightCard(branchId, scrollIntoView) {
@@ -2151,7 +2150,11 @@
           const isTarget = id === branchId;
           marker.setIcon(createDivIcon(isTarget));
           if (isTarget) {
-            marker.openPopup();
+            // Ensure map geometry is calibrated before opening popup
+            state.map.invalidateSize(true);
+            requestAnimationFrame(() => {
+              marker.openPopup();
+            });
           }
         });
       }
