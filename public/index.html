@@ -649,20 +649,34 @@
     .card-top-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      justify-content: flex-start;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .store-badge {
       display: inline-flex;
       align-items: center;
-      padding: 3px 8px;
+      padding: 2.5px 7px;
       background-color: #DD9933;
       color: #ffffff;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
+      line-height: 1.2;
+      border-radius: 4px;
+    }
+
+    .floor-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2.5px 7px;
+      background-color: #f0f4f1;
+      color: var(--color-primary);
+      border: 1px solid #dce5df;
+      font-size: 10.5px;
+      font-weight: 600;
       line-height: 1.2;
       border-radius: 4px;
     }
@@ -978,6 +992,14 @@
       box-sizing: border-box;
     }
 
+    .popup-top-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
     .popup-store {
       display: inline-block;
       padding: 2px 7px;
@@ -989,7 +1011,18 @@
       text-transform: uppercase;
       line-height: 1.2;
       border-radius: 4px;
-      margin-bottom: 6px;
+    }
+
+    .popup-floor {
+      display: inline-block;
+      padding: 2px 7px;
+      background-color: #f0f4f1;
+      color: var(--color-primary);
+      border: 1px solid #dce5df;
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 1.2;
+      border-radius: 4px;
     }
 
     .popup-title {
@@ -1959,10 +1992,12 @@
       function createBranchCardHTML(branch) {
         const isActive = branch.id === state.selectedBranchId;
         
-        const locationParts = [];
-        if (branch.province) locationParts.push(escapeHTML(branch.province));
-        if (branch.floor) locationParts.push('ชั้น ' + escapeHTML(branch.floor));
-        const locationStr = locationParts.join(' · ');
+        // Hide badge if store is 'CPP' or empty
+        const showStoreBadge = branch.store && branch.store.toUpperCase() !== 'CPP';
+        const storeBadgeHTML = showStoreBadge ? `<span class="store-badge">${escapeHTML(branch.store)}</span>` : '';
+        const floorBadgeHTML = branch.floor ? `<span class="floor-badge">ชั้น ${escapeHTML(branch.floor)}</span>` : '';
+
+        const locationStr = branch.province ? escapeHTML(branch.province) : '';
 
         const cleanPhone = (branch.phone || '').replace(/[^0-9+]/g, '');
         const phoneHTML = branch.phone ? `
@@ -1998,9 +2033,12 @@
 
         return `
           <div class="branch-card ${isActive ? 'is-active' : ''}" id="card-${branch.id}" onclick="window.selectBranch('${branch.id}', true)">
-            <div class="card-top-row">
-              <span class="store-badge">${escapeHTML(branch.store || 'COVERMARK')}</span>
-            </div>
+            ${(storeBadgeHTML || floorBadgeHTML) ? `
+              <div class="card-top-row">
+                ${storeBadgeHTML}
+                ${floorBadgeHTML}
+              </div>
+            ` : ''}
             <div class="branch-name">${escapeHTML(branch.branchName)}</div>
             ${locationStr ? `<div class="branch-location">${locationStr}</div>` : ''}
             ${phoneHTML}
@@ -2060,10 +2098,11 @@
       }
 
       function createPopupHTML(branch) {
-        const locationParts = [];
-        if (branch.province) locationParts.push(escapeHTML(branch.province));
-        if (branch.floor) locationParts.push('ชั้น ' + escapeHTML(branch.floor));
-        const locationStr = locationParts.join(' · ');
+        const showStoreBadge = branch.store && branch.store.toUpperCase() !== 'CPP';
+        const storeBadgeHTML = showStoreBadge ? `<span class="popup-store">${escapeHTML(branch.store)}</span>` : '';
+        const floorBadgeHTML = branch.floor ? `<span class="popup-floor">ชั้น ${escapeHTML(branch.floor)}</span>` : '';
+
+        const locationStr = branch.province ? escapeHTML(branch.province) : '';
         const cleanPhone = (branch.phone || '').replace(/[^0-9+]/g, '');
 
         const phoneBtn = cleanPhone ? `
@@ -2088,7 +2127,12 @@
 
         return `
           <div class="popup-inner">
-            <div class="popup-store">${escapeHTML(branch.store || 'COVERMARK')}</div>
+            ${(storeBadgeHTML || floorBadgeHTML) ? `
+              <div class="popup-top-row">
+                ${storeBadgeHTML}
+                ${floorBadgeHTML}
+              </div>
+            ` : ''}
             <div class="popup-title">${escapeHTML(branch.branchName)}</div>
             ${locationStr ? `<div class="popup-desc">${locationStr}</div>` : ''}
             ${(phoneBtn || navBtn) ? `
