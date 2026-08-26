@@ -55,7 +55,10 @@ export default async function handler(req, res) {
         map_url
       FROM branches
       WHERE LOWER(TRIM(status)) = 'active'
-      ORDER BY store ASC, branch_name ASC;
+      ORDER BY
+        CASE WHEN UPPER(TRIM(region)) = 'BKK' THEN 1 ELSE 2 END ASC,
+        store ASC,
+        branch_name ASC;
     `;
 
     const result = await client.execute(query);

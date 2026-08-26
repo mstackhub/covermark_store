@@ -1550,6 +1550,7 @@
         state.allBranches = data.map(b => ({
           id: String(b.id || '').trim(),
           store: String(b.store || '').trim(),
+          region: String(b.region || '').trim(),
           branchName: String(b.branchName || b.name || '').trim(),
           province: String(b.province || '').trim(),
           floor: b.floor ? String(b.floor).trim() : '',
@@ -1560,6 +1561,16 @@
                 : (b.long !== undefined && b.long !== null && !isNaN(Number(b.long)) ? Number(b.long) : null),
           mapUrl: String(b.mapUrl || b.link || '').trim()
         })).filter(b => b.id && b.branchName);
+
+        // Sort BKK first, then by Store, then by Branch Name
+        state.allBranches.sort((a, b) => {
+          const isBkkA = (a.region || '').toUpperCase() === 'BKK' ? 0 : 1;
+          const isBkkB = (b.region || '').toUpperCase() === 'BKK' ? 0 : 1;
+          if (isBkkA !== isBkkB) return isBkkA - isBkkB;
+          const storeComp = (a.store || '').localeCompare(b.store || '', 'th');
+          if (storeComp !== 0) return storeComp;
+          return (a.branchName || '').localeCompare(b.branchName || '', 'th');
+        });
 
         state.filteredBranches = [...state.allBranches];
 
@@ -1932,6 +1943,15 @@
           }
 
           return true;
+        });
+
+        state.filteredBranches.sort((a, b) => {
+          const isBkkA = (a.region || '').toUpperCase() === 'BKK' ? 0 : 1;
+          const isBkkB = (b.region || '').toUpperCase() === 'BKK' ? 0 : 1;
+          if (isBkkA !== isBkkB) return isBkkA - isBkkB;
+          const storeComp = (a.store || '').localeCompare(b.store || '', 'th');
+          if (storeComp !== 0) return storeComp;
+          return (a.branchName || '').localeCompare(b.branchName || '', 'th');
         });
 
         const hasActiveFilter = Boolean(state.searchQuery || state.selectedProvinces.size > 0 || state.selectedStores.size > 0);
