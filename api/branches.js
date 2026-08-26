@@ -45,6 +45,7 @@ export default async function handler(req, res) {
       SELECT
         id,
         store,
+        region,
         branch_name,
         province,
         floor,
@@ -62,6 +63,7 @@ export default async function handler(req, res) {
     const branches = result.rows.map(row => ({
       id: String(row.id || ''),
       store: String(row.store || ''),
+      region: String(row.region || ''),
       branchName: String(row.branch_name || ''),
       province: String(row.province || ''),
       floor: row.floor ? String(row.floor) : '',

@@ -151,6 +151,7 @@ async function importFromGoogleSheet() {
     const headerMap = {
       id: findHeaderIndex(headers, ['ID', 'id', 'รหัสสาขา', 'Branch ID', 'BranchID']),
       store: findHeaderIndex(headers, ['Store', 'store', 'กลุ่มห้าง', 'ห้าง', 'Department Store']),
+      region: findHeaderIndex(headers, ['Region', 'region', 'ภาค', 'ภูมิภาค']),
       name: findHeaderIndex(headers, ['ชื่อสาขา', 'Branch Name', 'BranchName', 'Name', 'สาขา']),
       province: findHeaderIndex(headers, ['จังหวัด', 'Province']),
       floor: findHeaderIndex(headers, ['ชั้น', 'Floor']),
@@ -167,6 +168,7 @@ async function importFromGoogleSheet() {
       INSERT INTO branches (
         id,
         store,
+        region,
         branch_name,
         province,
         floor,
@@ -176,10 +178,11 @@ async function importFromGoogleSheet() {
         map_url,
         status
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id)
       DO UPDATE SET
         store = excluded.store,
+        region = excluded.region,
         branch_name = excluded.branch_name,
         province = excluded.province,
         floor = excluded.floor,
@@ -201,10 +204,20 @@ async function importFromGoogleSheet() {
 
       let id = getVal(row, headerMap.id);
       const store = getVal(row, headerMap.store);
+      let region = getVal(row, headerMap.region);
       const branchName = normalizeBranchName(getVal(row, headerMap.name));
       let province = normalizeProvince(getVal(row, headerMap.province));
       if (!province && branchName.includes('นครราชสีมา')) {
         province = 'นครราชสีมา';
+      }
+
+      // Infer region if empty
+      if (!region) {
+        if (province === 'กรุงเทพมหานคร' || province === 'นนทบุรี' || province === 'ปทุมธานี' || province === 'สมุทรปราการ') {
+          region = 'BKK';
+        } else if (province) {
+          region = 'UPC';
+        }
       }
       const floor = getVal(row, headerMap.floor);
       const phone = getVal(row, headerMap.phone);
@@ -235,7 +248,7 @@ async function importFromGoogleSheet() {
 
       await client.execute({
         sql: upsertQuery,
-        args: [id, store || 'COVERMARK', branchName || store, province, floor, phone, lat, lng, mapUrl, status]
+        args: [id, store || 'COVERMARK', region, branchName || store, province, floor, phone, lat, lng, mapUrl, status]
       });
 
       totalImported++;

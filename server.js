@@ -70,6 +70,7 @@ app.get('/api/branches', async (req, res) => {
       SELECT
         id,
         store,
+        region,
         branch_name,
         province,
         floor,
@@ -88,6 +89,7 @@ app.get('/api/branches', async (req, res) => {
     const branches = result.rows.map(row => ({
       id: String(row.id || ''),
       store: String(row.store || ''),
+      region: String(row.region || ''),
       branchName: String(row.branch_name || ''),
       province: String(row.province || ''),
       floor: row.floor ? String(row.floor) : '',
